@@ -1,4 +1,4 @@
-const webAppUrl = 'https://script.google.com/macros/s/AKfycbw5SQuYxkVhgkcXMFWcq1oVRXTpJlCTDQVvM6rkGGEbm7yg42Vh4VXVZRSirUg3k85oNQ/exec';
+const webAppUrl = 'https://script.google.com/macros/s/AKfycbwY-4cac3jIZ-OHP1l3p4Fb4oiEgonQvxKu5h7swhpov8iMZXmQ7VpDTX_GG5zq9kIn2g/exec';
 
 function getCourseIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -262,3 +262,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     fetchAndDisplayData();
 });
+
