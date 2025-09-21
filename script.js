@@ -1,4 +1,5 @@
-// This file relies on 'webAppUrl' being defined in config.js
+const webAppUrl = 'https://script.google.com/macros/s/AKfycbw5SQuYxkVhgkcXMFWcq1oVRXTpJlCTDQVvM6rkGGEbm7yg42Vh4VXVZRSirUg3k85oNQ/exec';
+
 function getCourseIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const courseId = params.get('id');
