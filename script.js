@@ -90,10 +90,22 @@ function fetchAndDisplayData() {
             testimonials.forEach((t, index) => {
                 if (!t.text) return;
 
+                // 👇 نفصل النص عن الاسم باستخدام "-"
+                let textPart = t.text;
+                let authorPart = "";
+                if (t.text.includes("-")) {
+                    const parts = t.text.split("-");
+                    textPart = parts[0].trim();
+                    authorPart = parts[1] ? parts[1].trim() : "";
+                }
+
                 const testimonialSlide = document.createElement('div');
                 testimonialSlide.classList.add('testimonial-slide');
                 if (index === 0) testimonialSlide.classList.add('active');
-                testimonialSlide.innerHTML = `<p class="testimonial-text">"${t.text}"</p><p class="testimonial-author"><b>– ${t.author || ''}</b></p>`;
+                testimonialSlide.innerHTML = `
+                    <p class="testimonial-text">"${textPart}"</p>
+                    <p class="testimonial-author"><b>– ${authorPart}</b></p>
+                `;
                 testimonialsContainer.appendChild(testimonialSlide);
                 testimonialSlides.push(testimonialSlide);
 
@@ -193,4 +205,4 @@ window.addEventListener('scroll', () => {
 document.addEventListener('DOMContentLoaded', () => {
     AOS.init({ duration: 1000, once: true });
     fetchAndDisplayData();
-});
+}); 
