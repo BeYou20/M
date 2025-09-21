@@ -7,8 +7,14 @@ function getCourseIdFromUrl() {
 }
 
 function fetchAndDisplayData() {
-    fetch(webAppUrl)
+    fetch(webAppUrl, {
+            mode: 'no-cors'
+        })
         .then(response => {
+            if (response.type === 'opaque') {
+                console.warn("Received an opaque response. Data is likely not accessible. This is a common CORS issue.");
+                throw new Error("Opaque response received. Cannot access data.");
+            }
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
