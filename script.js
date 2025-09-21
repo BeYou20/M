@@ -7,14 +7,8 @@ function getCourseIdFromUrl() {
 }
 
 function fetchAndDisplayData() {
-    fetch(webAppUrl, {
-            mode: 'no-cors'
-        })
+    fetch(webAppUrl)
         .then(response => {
-            if (response.type === 'opaque') {
-                console.warn("Received an opaque response. Data is likely not accessible. This is a common CORS issue.");
-                throw new Error("Opaque response received. Cannot access data.");
-            }
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -53,14 +47,14 @@ function fetchAndDisplayData() {
             objectivesList.innerHTML = '';
             axesList.innerHTML = '';
 
-            const objectives = courseData.objectives ? courseData.objectives.split('|').map(item => item.trim()).filter(item => item) : [];
+            const objectives = courseData.objectives ? courseData.objectives.split('|') : [];
             objectives.forEach(item => {
                 const li = document.createElement('li');
                 li.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${item}`;
                 objectivesList.appendChild(li);
             });
 
-            const axes = courseData.axes ? courseData.axes.split('|').map(item => item.trim()).filter(item => item) : [];
+            const axes = courseData.axes ? courseData.axes.split('|') : [];
             axes.forEach(item => {
                 const li = document.createElement('li');
                 li.innerHTML = `<i class="fa-solid fa-book-open-reader"></i> ${item}`;
@@ -69,18 +63,20 @@ function fetchAndDisplayData() {
             
             // Populate Instructors Slider
             const instructorsContainer = document.getElementById('instructors-slider');
-            const instructorDotsContainer = document.querySelector('#instructors-slider .slider-dots');
+            const instructorDotsContainer = document.querySelector('#instructors-slider + .instructor-dots');
             instructorsContainer.innerHTML = '';
             if (instructorDotsContainer) {
                 instructorDotsContainer.innerHTML = '';
             }
             
-            const instructorsData = courseData.instructors ? courseData.instructors : [];
+            const instructorsData = courseData.instructors ? courseData.instructors.split('<br>') : [];
             const instructorSlides = [];
             instructorsData.forEach((item, index) => {
-                const name = item.name ? item.name.trim() : '';
+                const parts = item.split(':');
+                const name = parts[0] ? parts[0].trim() : '';
+                const expertise = parts[1] ? parts[1].trim() : '';
                 
-                if (name) {
+                if (name && expertise) {
                     const instructorSlide = document.createElement('div');
                     instructorSlide.classList.add('instructor-slide');
                     if (index === 0) instructorSlide.classList.add('active');
@@ -88,6 +84,7 @@ function fetchAndDisplayData() {
                     instructorSlide.innerHTML = `
                         <div class="instructor-card">
                             <h4>${name}</h4>
+                            <p>${expertise}</p>
                         </div>
                     `;
                     instructorsContainer.appendChild(instructorSlide);
@@ -104,24 +101,27 @@ function fetchAndDisplayData() {
 
             // Populate Testimonials Slider
             const testimonialsContainer = document.getElementById('testimonials-slider');
-            const testimonialDotsContainer = document.querySelector('#testimonials-slider .slider-dots');
+            const testimonialDotsContainer = document.querySelector('#testimonials-slider + .testimonial-dots');
             testimonialsContainer.innerHTML = '';
             if (testimonialDotsContainer) {
                  testimonialDotsContainer.innerHTML = '';
             }
 
-            const testimonialsData = courseData.testimonials ? courseData.testimonials : [];
+            const testimonialsData = courseData.testimonials ? courseData.testimonials.split('<br>') : [];
             const testimonialSlides = [];
             testimonialsData.forEach((item, index) => {
-                const text = item.text ? item.text.trim() : '';
+                const parts = item.split(' - ');
+                const text = parts[0] ? parts[0].trim() : '';
+                const author = parts[1] ? parts[1].trim() : '';
                 
-                if (text) {
+                if (text && author) {
                     const testimonialSlide = document.createElement('div');
                     testimonialSlide.classList.add('testimonial-slide');
                     if (index === 0) testimonialSlide.classList.add('active');
 
                     testimonialSlide.innerHTML = `
                         <p class="testimonial-text">"${text}"</p>
+                        <p class="testimonial-author"><b>– ${author}</b></p>
                     `;
                     testimonialsContainer.appendChild(testimonialSlide);
                     testimonialSlides.push(testimonialSlide);
@@ -138,7 +138,7 @@ function fetchAndDisplayData() {
             // Populate FAQ
             const faqContainer = document.getElementById('faq-container');
             faqContainer.innerHTML = '';
-            const faqs = courseData.faqs ? courseData.faqs.split('<br>').map(item => item.trim()).filter(item => item) : [];
+            const faqs = courseData.faqs ? courseData.faqs.split('<br>') : [];
             faqs.forEach(item => {
                 const parts = item.split(':');
                 const question = parts[0] ? parts[0].trim() : '';
@@ -160,13 +160,6 @@ function fetchAndDisplayData() {
                 }
             });
 
-            // Populate Achievements
-            const achievementsList = document.getElementById('achievements-list');
-            if (achievementsList && courseData.achievementsText) {
-                const achievements = courseData.achievementsText.split('|').map(item => item.trim()).filter(item => item !== '');
-                achievementsList.innerHTML = achievements.map(item => `<li><i class="fa-solid fa-trophy"></i>${item}</li>`).join('');
-            }
-            
             // Add event listeners for FAQ
             document.querySelectorAll('.faq-question').forEach(question => {
                 question.addEventListener('click', () => {
@@ -185,14 +178,13 @@ function fetchAndDisplayData() {
 
             let currentInstructorSlide = 0;
             let currentTestimonialSlide = 0;
-            const instructorDots = document.querySelectorAll('#instructors-slider .slider-dots .dot');
-            const testimonialDots = document.querySelectorAll('#testimonials-slider .slider-dots .dot');
-            
+
             function showSlide(slides, index, dotsContainer, isInstructor) {
+                const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
                 slides.forEach(slide => slide.classList.remove('active'));
-                dotsContainer.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
                 if (slides[index]) slides[index].classList.add('active');
-                if (dotsContainer.querySelectorAll('.dot')[index]) dotsContainer.querySelectorAll('.dot')[index].classList.add('active');
+                if (dots[index]) dots[index].classList.add('active');
                 if (isInstructor) currentInstructorSlide = index; else currentTestimonialSlide = index;
             }
 
@@ -212,6 +204,7 @@ function fetchAndDisplayData() {
             
             if (instructorsData.length > 1) setInterval(nextInstructorSlide, 5000);
             if (testimonialsData.length > 1) setInterval(nextTestimonialSlide, 5000);
+
         })
         .catch(error => {
             console.error('Error fetching data:', error);
