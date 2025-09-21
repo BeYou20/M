@@ -1,17 +1,17 @@
+// رابط Google Apps Script
 const webAppUrl = 'https://script.google.com/macros/s/AKfycbw5SQuYxkVhgkcXMFWcq1oVRXTpJlCTDQVvM6rkGGEbm7yg42Vh4VXVZRSirUg3k85oNQ/exec';
 
+// دالة لجلب معرف الدورة من رابط الصفحة
 function getCourseIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    const courseId = params.get('id');
-    return courseId || 'defaultCourseId';
+    return params.get('id'); // مثال: ?id=hifz-quran
 }
 
+// الدالة الرئيسية لجلب البيانات وعرضها
 function fetchAndDisplayData() {
     fetch(webAppUrl)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
@@ -19,20 +19,19 @@ function fetchAndDisplayData() {
             const courseData = data.find(row => row && row.id && row.id.toString() === courseId.toString());
 
             if (!courseData) {
-                console.error(`Course with ID "${courseId}" not found in data.`);
                 document.body.innerHTML = '<h1>لم يتم العثور على بيانات هذه الدورة.</h1><p style="text-align:center;">يرجى التأكد من الرابط أو مُعرّف الدورة (ID) في ورقة البيانات.</p>';
                 return;
             }
 
-            // Update Page Content
+            // تحديث محتوى الصفحة
             document.getElementById('page-title').textContent = courseData.title || '';
             document.getElementById('hero-title').textContent = courseData.title || '';
             document.getElementById('hero-description').textContent = courseData.heroDescription || '';
             document.getElementById('marquee-text').textContent = courseData.marqueeText || '';
             document.getElementById('course-about').textContent = courseData.courseAbout || '';
-            document.getElementById('achievements-text').textContent = courseData.achievementsText || '';
             document.getElementById('course-name-input').value = courseData.title || '';
 
+            // الفيديو
             const videoSection = document.querySelector('.video-section');
             if (courseData.videoUrl) {
                 videoSection.style.display = 'block';
@@ -41,101 +40,76 @@ function fetchAndDisplayData() {
                 videoSection.style.display = 'none';
             }
 
-            // Populate Lists (Objectives and Axes)
+            // القوائم
             const objectivesList = document.getElementById('objectives-list');
             const axesList = document.getElementById('axes-list');
             objectivesList.innerHTML = '';
             axesList.innerHTML = '';
 
-            const objectives = courseData.objectives ? courseData.objectives.split('|') : [];
+            const objectives = courseData.objectives ? courseData.objectives.split('<br>') : [];
             objectives.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${item}`;
-                objectivesList.appendChild(li);
+                if(item.trim()){
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${item}`;
+                    objectivesList.appendChild(li);
+                }
             });
 
-            const axes = courseData.axes ? courseData.axes.split('|') : [];
+            const axes = courseData.axes ? courseData.axes.split('<br>') : [];
             axes.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = `<i class="fa-solid fa-book-open-reader"></i> ${item}`;
-                axesList.appendChild(li);
+                if(item.trim()){
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fa-solid fa-book-open-reader"></i> ${item}`;
+                    axesList.appendChild(li);
+                }
             });
-            
-            // Populate Instructors Slider
+
+            // الإنجازات
+            const achievementsContainer = document.getElementById('achievements-text');
+            const achievements = courseData.achievementsText ? courseData.achievementsText.split('<br>') : [];
+            achievementsContainer.innerHTML = achievements.map(a => '• ' + a).join('<br>');
+
+            // المدربين
             const instructorsContainer = document.getElementById('instructors-slider');
-            const instructorDotsContainer = document.querySelector('#instructors-slider + .instructor-dots');
             instructorsContainer.innerHTML = '';
-            if (instructorDotsContainer) {
-                instructorDotsContainer.innerHTML = '';
-            }
-            
-            const instructorsData = courseData.instructors ? courseData.instructors.split('<br>') : [];
+
+            const instructorsData = courseData.instructors || [];
             const instructorSlides = [];
             instructorsData.forEach((item, index) => {
                 const parts = item.split(':');
                 const name = parts[0] ? parts[0].trim() : '';
                 const expertise = parts[1] ? parts[1].trim() : '';
-                
-                if (name && expertise) {
-                    const instructorSlide = document.createElement('div');
-                    instructorSlide.classList.add('instructor-slide');
-                    if (index === 0) instructorSlide.classList.add('active');
-                    
-                    instructorSlide.innerHTML = `
-                        <div class="instructor-card">
-                            <h4>${name}</h4>
-                            <p>${expertise}</p>
-                        </div>
-                    `;
-                    instructorsContainer.appendChild(instructorSlide);
-                    instructorSlides.push(instructorSlide);
-
-                    if (instructorDotsContainer) {
-                        const dot = document.createElement('span');
-                        dot.classList.add('dot');
-                        dot.addEventListener('click', () => showSlide(instructorSlides, index, instructorDotsContainer, true));
-                        instructorDotsContainer.appendChild(dot);
-                    }
+                if(name && expertise){
+                    const slide = document.createElement('div');
+                    slide.classList.add('instructor-slide');
+                    if(index === 0) slide.classList.add('active');
+                    slide.innerHTML = `<div class="instructor-card"><h4>${name}</h4><p>${expertise}</p></div>`;
+                    instructorsContainer.appendChild(slide);
+                    instructorSlides.push(slide);
                 }
             });
 
-            // Populate Testimonials Slider
+            // آراء المتدربين
             const testimonialsContainer = document.getElementById('testimonials-slider');
-            const testimonialDotsContainer = document.querySelector('#testimonials-slider + .testimonial-dots');
             testimonialsContainer.innerHTML = '';
-            if (testimonialDotsContainer) {
-                 testimonialDotsContainer.innerHTML = '';
-            }
 
-            const testimonialsData = courseData.testimonials ? courseData.testimonials.split('<br>') : [];
+            const testimonialsData = courseData.testimonials || [];
             const testimonialSlides = [];
             testimonialsData.forEach((item, index) => {
                 const parts = item.split(' - ');
                 const text = parts[0] ? parts[0].trim() : '';
                 const author = parts[1] ? parts[1].trim() : '';
-                
-                if (text && author) {
-                    const testimonialSlide = document.createElement('div');
-                    testimonialSlide.classList.add('testimonial-slide');
-                    if (index === 0) testimonialSlide.classList.add('active');
-
-                    testimonialSlide.innerHTML = `
-                        <p class="testimonial-text">"${text}"</p>
-                        <p class="testimonial-author"><b>– ${author}</b></p>
-                    `;
-                    testimonialsContainer.appendChild(testimonialSlide);
-                    testimonialSlides.push(testimonialSlide);
-
-                    if (testimonialDotsContainer) {
-                        const dot = document.createElement('span');
-                        dot.classList.add('dot');
-                        dot.addEventListener('click', () => showSlide(testimonialSlides, index, testimonialDotsContainer, false));
-                        testimonialDotsContainer.appendChild(dot);
-                    }
+                if(text && author){
+                    const slide = document.createElement('div');
+                    slide.classList.add('testimonial-slide');
+                    if(index === 0) slide.classList.add('active');
+                    slide.innerHTML = `<p class="testimonial-text">"${text}"</p><p class="testimonial-author"><b>– ${author}</b></p>`;
+                    testimonialsContainer.appendChild(slide);
+                    testimonialSlides.push(slide);
                 }
             });
-            
-            // Populate FAQ
+
+            // الأسئلة الشائعة
             const faqContainer = document.getElementById('faq-container');
             faqContainer.innerHTML = '';
             const faqs = courseData.faqs ? courseData.faqs.split('<br>') : [];
@@ -143,8 +117,7 @@ function fetchAndDisplayData() {
                 const parts = item.split(':');
                 const question = parts[0] ? parts[0].trim() : '';
                 const answer = parts[1] ? parts[1].trim() : '';
-                
-                if (question && answer) {
+                if(question && answer){
                     const faqItem = document.createElement('div');
                     faqItem.classList.add('faq-item');
                     faqItem.innerHTML = `
@@ -160,50 +133,13 @@ function fetchAndDisplayData() {
                 }
             });
 
-            // Add event listeners for FAQ
             document.querySelectorAll('.faq-question').forEach(question => {
                 question.addEventListener('click', () => {
                     const answer = question.nextElementSibling;
-                    const icon = question.querySelector('i');
                     const isActive = question.classList.toggle('active');
-                    if (isActive) {
-                        answer.style.display = 'block';
-                        icon.classList.add('rotated');
-                    } else {
-                        answer.style.display = 'none';
-                        icon.classList.remove('rotated');
-                    }
+                    answer.style.display = isActive ? 'block' : 'none';
                 });
             });
-
-            let currentInstructorSlide = 0;
-            let currentTestimonialSlide = 0;
-
-            function showSlide(slides, index, dotsContainer, isInstructor) {
-                const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
-                slides.forEach(slide => slide.classList.remove('active'));
-                dots.forEach(dot => dot.classList.remove('active'));
-                if (slides[index]) slides[index].classList.add('active');
-                if (dots[index]) dots[index].classList.add('active');
-                if (isInstructor) currentInstructorSlide = index; else currentTestimonialSlide = index;
-            }
-
-            function nextInstructorSlide() {
-                if (instructorSlides.length > 0) {
-                    currentInstructorSlide = (currentInstructorSlide + 1) % instructorSlides.length;
-                    showSlide(instructorSlides, currentInstructorSlide, instructorDotsContainer, true);
-                }
-            }
-            
-            function nextTestimonialSlide() {
-                if (testimonialSlides.length > 0) {
-                    currentTestimonialSlide = (currentTestimonialSlide + 1) % testimonialSlides.length;
-                    showSlide(testimonialSlides, currentTestimonialSlide, testimonialDotsContainer, false);
-                }
-            }
-            
-            if (instructorsData.length > 1) setInterval(nextInstructorSlide, 5000);
-            if (testimonialsData.length > 1) setInterval(nextTestimonialSlide, 5000);
 
         })
         .catch(error => {
@@ -212,48 +148,5 @@ function fetchAndDisplayData() {
         });
 }
 
-// Form Submission
-function submitForm(event) {
-    event.preventDefault();
-    const form = document.getElementById('form');
-    const formData = new FormData(form);
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbyR6j1d5YlV04bM9Q2T9H4k5eA6Lg0xT4g5pL8-z5qJ1q9u2X5Q/exec";
-    
-    fetch(scriptUrl, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-        alert('تم إرسال البيانات بنجاح!');
-        form.reset();
-    })
-    .catch(error => {
-        console.error('Error!', error.message);
-        alert('حدث خطأ أثناء إرسال البيانات. يرجى المحاولة لاحقًا.');
-    });
-}
-
-// AOS and Sticky Buttons
-window.addEventListener('scroll', function() {
-    const heroSection = document.querySelector('.hero');
-    const registerBtn = document.querySelector('.sticky-register-btn');
-    const whatsappBtn = document.querySelector('.sticky-whatsapp-btn');
-    const scrollPosition = window.scrollY;
-
-    if (scrollPosition > (heroSection.offsetHeight / 2)) {
-        registerBtn.style.display = 'block';
-        whatsappBtn.style.display = 'flex';
-    } else {
-        registerBtn.style.display = 'none';
-        whatsappBtn.style.display = 'none';
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    AOS.init({
-        duration: 1000,
-        once: true,
-    });
-    fetchAndDisplayData();
-});
+// استدعاء الدالة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', fetchAndDisplayData); 
