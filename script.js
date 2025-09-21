@@ -1,4 +1,4 @@
-const webAppUrl = 'https://script.google.com/macros/s/AKfycbwY-4cac3jIZ-OHP1l3p4Fb4oiEgonQvxKu5h7swhpov8iMZXmQ7VpDTX_GG5zq9kIn2g/exec';
+const webAppUrl = 'https://script.google.com/macros/s/AKfycbzWIIp5lEOk4QCMZMSgqWbkNxRdQN7kyPjZFM4jGFGDVEWbcs0KoY0HeizLO0jAIiHKVw/exec';
 
 function getCourseIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -73,9 +73,8 @@ function fetchAndDisplayData() {
             const instructorSlides = [];
             instructorsData.forEach((item, index) => {
                 const name = item.name ? item.name.trim() : '';
-                const expertise = item.expertise ? item.expertise.trim() : '';
                 
-                if (name && expertise) {
+                if (name) {
                     const instructorSlide = document.createElement('div');
                     instructorSlide.classList.add('instructor-slide');
                     if (index === 0) instructorSlide.classList.add('active');
@@ -83,7 +82,6 @@ function fetchAndDisplayData() {
                     instructorSlide.innerHTML = `
                         <div class="instructor-card">
                             <h4>${name}</h4>
-                            <p>${expertise}</p>
                         </div>
                     `;
                     instructorsContainer.appendChild(instructorSlide);
@@ -110,16 +108,14 @@ function fetchAndDisplayData() {
             const testimonialSlides = [];
             testimonialsData.forEach((item, index) => {
                 const text = item.text ? item.text.trim() : '';
-                const author = item.author ? item.author.trim() : '';
                 
-                if (text && author) {
+                if (text) {
                     const testimonialSlide = document.createElement('div');
                     testimonialSlide.classList.add('testimonial-slide');
                     if (index === 0) testimonialSlide.classList.add('active');
 
                     testimonialSlide.innerHTML = `
                         <p class="testimonial-text">"${text}"</p>
-                        <p class="testimonial-author"><b>– ${author}</b></p>
                     `;
                     testimonialsContainer.appendChild(testimonialSlide);
                     testimonialSlides.push(testimonialSlide);
@@ -262,4 +258,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     fetchAndDisplayData();
 });
-
