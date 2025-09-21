@@ -1,4 +1,3 @@
-// رابط Google Apps Script
 const webAppUrl = 'https://script.google.com/macros/s/AKfycbw5SQuYxkVhgkcXMFWcq1oVRXTpJlCTDQVvM6rkGGEbm7yg42Vh4VXVZRSirUg3k85oNQ/exec';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -8,9 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(data => {
-            if (!data || data.length === 0) throw new Error("لا توجد بيانات متاحة");
+            if (!data) throw new Error("لا توجد بيانات متاحة");
 
-            const courseData = data[0]; // جلب أول دورة مباشرة لاختبار العرض
+            // دعم مصفوفة أو كائن واحد
+            const courseData = Array.isArray(data) ? data[0] : data;
+
+            console.log('بيانات الدورة:', courseData); // للتأكد من الحقول
 
             // تحديث الصفحة
             document.getElementById('page-title').textContent = courseData.title || '';
@@ -35,7 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
             objectivesList.innerHTML = '';
             axesList.innerHTML = '';
 
-            (courseData.objectives || '').split('<br>').forEach(item => {
+            // دالة لمعاملات النص أو المصفوفة
+            const parseField = (field) => {
+                if (!field) return [];
+                if (Array.isArray(field)) return field;
+                return field.split('<br>');
+            };
+
+            parseField(courseData.objectives).forEach(item => {
                 if(item.trim()){
                     const li = document.createElement('li');
                     li.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${item}`;
@@ -43,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            (courseData.axes || '').split('<br>').forEach(item => {
+            parseField(courseData.axes).forEach(item => {
                 if(item.trim()){
                     const li = document.createElement('li');
                     li.innerHTML = `<i class="fa-solid fa-book-open-reader"></i> ${item}`;
@@ -53,7 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // الإنجازات
             const achievementsContainer = document.getElementById('achievements-text');
-            achievementsContainer.innerHTML = (courseData.achievementsText || '').split('<br>').map(a => '• ' + a).join('<br>');
+            achievementsContainer.innerHTML = parseField(courseData.achievementsText)
+                .map(a => '• ' + a)
+                .join('<br>');
 
             console.log('تم تحميل البيانات بنجاح!');
         })
