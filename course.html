@@ -220,7 +220,7 @@
     border-radius: 10px;
     cursor:pointer;
     transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+    box-shadow: 3px 6px 15px rgba(0,0,0,0.2);
   }
   #registrationForm button:hover {
     background: #003366;
@@ -551,8 +551,8 @@
 
             const achievementsList = document.getElementById('achievements-list');
             achievementsList.innerHTML = '';
-            if (course.achievements) {
-                course.achievements.split('|').forEach(achText => {
+            if (course.achievementsText) {
+                course.achievementsText.split('|').forEach(achText => {
                     const li = document.createElement('li');
                     li.innerHTML = `<i class="fa fa-star"></i> ${achText.trim()}`;
                     achievementsList.appendChild(li);
