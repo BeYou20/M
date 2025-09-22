@@ -366,7 +366,7 @@
         <select name="gender" id="gender" required>
           <option value="" disabled selected>الجنس</option>
           <option value="ذكر">ذكر</option>
-          <option value="أنثى">أنثى</option>
+        <option value="أنثى">أنثى</option>
         </select>
 
         <label for="age">العمر</label>
@@ -484,22 +484,19 @@
             const instructorsSlider = document.getElementById('instructors-slider');
             instructorsSlider.innerHTML = '';
             if (course.instructors) {
-                try {
-                    const instructors = JSON.parse(course.instructors);
-                    instructors.forEach((inst, i) => {
-                        const div = document.createElement('div');
-                        div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
-                        div.innerHTML = `
-                            <div class="instructor-card">
-                                <img src="${inst.photo}" alt="${inst.name}">
-                                <h4>${inst.name}</h4>
-                                <p>${inst.role}</p>
-                            </div>`;
-                        instructorsSlider.appendChild(div);
-                    });
-                } catch (e) {
-                    instructorsSlider.parentElement.style.display = 'none';
-                }
+                const instructorNames = course.instructors.split('|');
+                instructorNames.forEach((inst, i) => {
+                    const [name, role] = inst.split(' - ');
+                    const div = document.createElement('div');
+                    div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
+                    div.innerHTML = `
+                        <div class="instructor-card">
+                            <img src="" alt="${name}">
+                            <h4>${name}</h4>
+                            <p>${role}</p>
+                        </div>`;
+                    instructorsSlider.appendChild(div);
+                });
             } else {
                 instructorsSlider.parentElement.style.display = 'none';
             }
@@ -507,17 +504,14 @@
             const testimonialsSlider = document.getElementById('testimonials-slider');
             testimonialsSlider.innerHTML = '';
             if (course.testimonials) {
-                try {
-                    const testimonials = JSON.parse(course.testimonials);
-                    testimonials.forEach((t, i) => {
-                        const div = document.createElement('div');
-                        div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
-                        div.innerHTML = `<p class="testimonial-text">"${t.text}"</p><p><strong>${t.name}</strong></p>`;
-                        testimonialsSlider.appendChild(div);
-                    });
-                } catch (e) {
-                    testimonialsSlider.parentElement.style.display = 'none';
-                }
+                const testimonialList = course.testimonials.split('|');
+                testimonialList.forEach((t, i) => {
+                    const [text, name] = t.split(' - ');
+                    const div = document.createElement('div');
+                    div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
+                    div.innerHTML = `<p class="testimonial-text">"${text}"</p><p><strong>${name}</strong></p>`;
+                    testimonialsSlider.appendChild(div);
+                });
             } else {
                 testimonialsSlider.parentElement.style.display = 'none';
             }
@@ -525,26 +519,23 @@
             const faqContainer = document.getElementById('faq-container');
             faqContainer.innerHTML = '';
             if (course.faqs) {
-                try {
-                    const faqs = JSON.parse(course.faqs);
-                    faqs.forEach(f => {
-                        const div = document.createElement('div');
-                        div.className = 'faq-item';
-                        div.innerHTML = `
-                            <div class="faq-question"><span>${f.question}</span><i class="fa fa-chevron-down"></i></div>
-                            <div class="faq-answer">${f.answer}</div>`;
-                        faqContainer.appendChild(div);
+                const faqList = course.faqs.split('|');
+                faqList.forEach(f => {
+                    const [question, answer] = f.split(':');
+                    const div = document.createElement('div');
+                    div.className = 'faq-item';
+                    div.innerHTML = `
+                        <div class="faq-question"><span>${question.trim()}</span><i class="fa fa-chevron-down"></i></div>
+                        <div class="faq-answer">${answer.trim()}</div>`;
+                    faqContainer.appendChild(div);
+                });
+                document.querySelectorAll('.faq-question').forEach(q => {
+                    q.addEventListener('click', () => {
+                        q.classList.toggle('active');
+                        const ans = q.nextElementSibling;
+                        ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
                     });
-                    document.querySelectorAll('.faq-question').forEach(q => {
-                        q.addEventListener('click', () => {
-                            q.classList.toggle('active');
-                            const ans = q.nextElementSibling;
-                            ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
-                        });
-                    });
-                } catch (e) {
-                    faqContainer.parentElement.style.display = 'none';
-                }
+                });
             } else {
                 faqContainer.parentElement.style.display = 'none';
             }
