@@ -2,73 +2,77 @@
 const urlParams = new URLSearchParams(window.location.search);
 const courseId = urlParams.get('id');
 
-// رابط Web App
-const webAppUrl = "https://script.google.com/macros/s/AKfycbwY-4cac3jIZ-OHP1l3p4Fb4oiEgonQvxKu5h7swhpov8iMZXmQ7VpDTX_GG5zq9kIn2g/exec";
-
-// استدعاء البيانات
-fetch(webAppUrl)
+// استدعاء البيانات من Google Apps Script Web App
+fetch('https://script.google.com/macros/s/AKfycbwY-4cac3jIZ-OHP1l3p4Fb4oiEgonQvxKu5h7swhpov8iMZXmQ7VpDTX_GG5zq9kIn2g/exec')
   .then(response => response.json())
   .then(data => {
-    // إذا كانت مصفوفة، البحث عن الدورة بالـ id
-    let course = Array.isArray(data) 
-        ? data.find(c => c.id === courseId) || data[0]
-        : data;
-
-    if(!course) {
-      console.error("❌ لم يتم العثور على الدورة.");
-      return;
+    let course;
+    // إذا JSON مصفوفة
+    if (Array.isArray(data)) {
+      course = data.find(c => c.id === courseId) || data[0]; // افتراضي أول دورة
+    } else {
+      course = data; // كائن واحد فقط
     }
 
-    // ملأ العناصر بالبيانات مع حماية ضد القيم الفارغة
-    document.getElementById("page-title").textContent = course.title || "";
-    document.getElementById("hero-title").textContent = course.title || "";
-    document.getElementById("hero-description").textContent = course.heroDescription || "";
-    document.getElementById("marquee-text").textContent = course.marqueeText || "";
-    document.getElementById("course-about").textContent = course.courseAbout || "";
+    // ملأ العناصر بالبيانات
+    document.getElementById("page-title").textContent = course.title;
+    document.getElementById("hero-title").textContent = course.title;
+    document.getElementById("hero-description").textContent = course.heroDescription;
+    document.getElementById("marquee-text").textContent = course.marqueeText;
+    document.getElementById("course-about").textContent = course.courseAbout;
 
     // الأهداف
     const objectivesList = document.getElementById("objectives-list");
     objectivesList.innerHTML = "";
-    (course.objectives || "").split('|').forEach(obj => {
-      const li = document.createElement("li");
-      li.innerHTML = `<i class="fas fa-check-circle"></i>${obj.trim()}`;
-      objectivesList.appendChild(li);
-    });
+    if(course.objectives){
+      course.objectives.split('|').forEach(obj => {
+        const li = document.createElement("li");
+        li.innerHTML = `<i class="fas fa-check-circle"></i>${obj.trim()}`;
+        objectivesList.appendChild(li);
+      });
+    }
 
     // المحاور
     const axesList = document.getElementById("axes-list");
     axesList.innerHTML = "";
-    (course.axes || "").split('|').forEach(ax => {
-      const li = document.createElement("li");
-      li.innerHTML = `<i class="fas fa-circle"></i>${ax.trim()}`;
-      axesList.appendChild(li);
-    });
+    if(course.axes){
+      course.axes.split('|').forEach(ax => {
+        const li = document.createElement("li");
+        li.innerHTML = `<i class="fas fa-circle"></i>${ax.trim()}`;
+        axesList.appendChild(li);
+      });
+    }
 
     // المدربين
     const instructorsSlider = document.getElementById("instructors-slider");
     instructorsSlider.innerHTML = "";
-    course.instructors?.forEach(inst => {
-      const div = document.createElement("div");
-      div.classList.add("instructor-slide", "active");
-      div.innerHTML = `<div class="instructor-card"><h4>${inst.name}</h4></div>`;
-      instructorsSlider.appendChild(div);
-    });
+    if(course.instructors && course.instructors.length){
+      course.instructors.forEach(inst => {
+        const div = document.createElement("div");
+        div.classList.add("instructor-slide", "active");
+        div.innerHTML = `<div class="instructor-card"><h4>${inst.name}</h4></div>`;
+        instructorsSlider.appendChild(div);
+      });
+    }
 
     // آراء المتدربين
     const testimonialsSlider = document.getElementById("testimonials-slider");
     testimonialsSlider.innerHTML = "";
-    course.testimonials?.forEach(test => {
-      const div = document.createElement("div");
-      div.classList.add("testimonial-slide", "active");
-      div.innerHTML = `<p class="testimonial-text">"${test.text}"</p>`;
-      testimonialsSlider.appendChild(div);
-    });
+    if(course.testimonials && course.testimonials.length){
+      course.testimonials.forEach(test => {
+        const div = document.createElement("div");
+        div.classList.add("testimonial-slide", "active");
+        div.innerHTML = `<p class="testimonial-text">"${test.text}"</p>`;
+        testimonialsSlider.appendChild(div);
+      });
+    }
 
     // الأسئلة الشائعة
     const faqContainer = document.getElementById("faq-container");
     faqContainer.innerHTML = "";
     if(course.faqs){
-      (course.faqs || "").split('|').forEach(faq => {
+      const faqsArray = course.faqs.split('|');
+      faqsArray.forEach(faq => {
         const [question, answer] = faq.split(':');
         if(question && answer){
           const div = document.createElement("div");
@@ -83,23 +87,20 @@ fetch(webAppUrl)
     }
 
     // الإنجازات
-    const achievementsList = document.getElementById("achievements-list");
-    achievementsList.innerHTML = "";
-    (course.achievementsText || "").split('|').forEach(a => {
-      const li = document.createElement("li");
-      li.textContent = a.trim();
-      achievementsList.appendChild(li);
-    });
+    const achievementsText = document.getElementById("achievements-text");
+    if(course.achievementsText){
+      achievementsText.textContent = course.achievementsText.split('|').join(' | ');
+    }
 
     // الفيديو
     if(course.videoUrl){
       const videoSection = document.querySelector(".video-section iframe");
-      if(videoSection) videoSection.src = course.videoUrl;
+      videoSection.src = course.videoUrl;
     }
 
     // تحديث اسم الدورة في النموذج
     const courseNameInput = document.getElementById("course-name-input");
-    if(courseNameInput) courseNameInput.value = course.title || "";
+    if(courseNameInput) courseNameInput.value = course.title;
 
   })
   .catch(error => console.error("خطأ في تحميل بيانات الدورة:", error));
@@ -109,6 +110,10 @@ document.addEventListener("click", function(e){
   if(e.target.classList.contains("faq-question")){
     e.target.classList.toggle("active");
     const answer = e.target.nextElementSibling;
-    if(answer) answer.classList.toggle("visible");
+    if(answer.style.display === "block"){
+      answer.style.display = "none";
+    } else {
+      answer.style.display = "block";
+    }
   }
 });
