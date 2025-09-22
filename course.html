@@ -460,11 +460,15 @@
             const objectivesList = document.getElementById('objectives-list');
             objectivesList.innerHTML = '';
             if (course.objectives) {
-                course.objectives.split('|').forEach(objText => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<i class="fa fa-check-circle"></i> ${objText.trim()}`;
-                    objectivesList.appendChild(li);
-                });
+                try {
+                    course.objectives.split('|').forEach(objText => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<i class="fa fa-check-circle"></i> ${objText.trim()}`;
+                        objectivesList.appendChild(li);
+                    });
+                } catch(e) {
+                    console.error('Error parsing objectives:', e);
+                }
             } else {
                 objectivesList.parentElement.style.display = 'none';
             }
@@ -472,11 +476,15 @@
             const axesList = document.getElementById('axes-list');
             axesList.innerHTML = '';
             if (course.axes) {
-                course.axes.split('|').forEach(axesText => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<i class="fa fa-arrow-alt-circle-left"></i> ${axesText.trim()}`;
-                    axesList.appendChild(li);
-                });
+                try {
+                    course.axes.split('|').forEach(axesText => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<i class="fa fa-arrow-alt-circle-left"></i> ${axesText.trim()}`;
+                        axesList.appendChild(li);
+                    });
+                } catch(e) {
+                    console.error('Error parsing axes:', e);
+                }
             } else {
                 axesList.parentElement.style.display = 'none';
             }
@@ -484,19 +492,39 @@
             const instructorsSlider = document.getElementById('instructors-slider');
             instructorsSlider.innerHTML = '';
             if (course.instructors) {
-                const instructorNames = course.instructors.split('|');
-                instructorNames.forEach((inst, i) => {
-                    const [name, role] = inst.split(' - ');
-                    const div = document.createElement('div');
-                    div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
-                    div.innerHTML = `
-                        <div class="instructor-card">
-                            <img src="" alt="${name}">
-                            <h4>${name}</h4>
-                            <p>${role}</p>
-                        </div>`;
-                    instructorsSlider.appendChild(div);
-                });
+                try {
+                    const instructors = JSON.parse(course.instructors);
+                    instructors.forEach((inst, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
+                        div.innerHTML = `
+                            <div class="instructor-card">
+                                <img src="${inst.photo}" alt="${inst.name}">
+                                <h4>${inst.name}</h4>
+                                <p>${inst.role}</p>
+                            </div>`;
+                        instructorsSlider.appendChild(div);
+                    });
+                } catch (e) {
+                    // Fallback to simple text if JSON parsing fails
+                    try {
+                        const instructorNames = course.instructors.split('|');
+                        instructorNames.forEach((inst, i) => {
+                            const [name, role] = inst.split(' - ');
+                            const div = document.createElement('div');
+                            div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
+                            div.innerHTML = `
+                                <div class="instructor-card">
+                                    <img src="https://via.placeholder.com/150" alt="${name}">
+                                    <h4>${name}</h4>
+                                    <p>${role}</p>
+                                </div>`;
+                            instructorsSlider.appendChild(div);
+                        });
+                    } catch(e2) {
+                        instructorsSlider.parentElement.style.display = 'none';
+                    }
+                }
             } else {
                 instructorsSlider.parentElement.style.display = 'none';
             }
@@ -504,14 +532,29 @@
             const testimonialsSlider = document.getElementById('testimonials-slider');
             testimonialsSlider.innerHTML = '';
             if (course.testimonials) {
-                const testimonialList = course.testimonials.split('|');
-                testimonialList.forEach((t, i) => {
-                    const [text, name] = t.split(' - ');
-                    const div = document.createElement('div');
-                    div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
-                    div.innerHTML = `<p class="testimonial-text">"${text}"</p><p><strong>${name}</strong></p>`;
-                    testimonialsSlider.appendChild(div);
-                });
+                try {
+                    const testimonials = JSON.parse(course.testimonials);
+                    testimonials.forEach((t, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
+                        div.innerHTML = `<p class="testimonial-text">"${t.text}"</p><p><strong>${t.name}</strong></p>`;
+                        testimonialsSlider.appendChild(div);
+                    });
+                } catch (e) {
+                    // Fallback to simple text if JSON parsing fails
+                    try {
+                        const testimonialList = course.testimonials.split('|');
+                        testimonialList.forEach((t, i) => {
+                            const [text, name] = t.split(' - ');
+                            const div = document.createElement('div');
+                            div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
+                            div.innerHTML = `<p class="testimonial-text">"${text}"</p><p><strong>${name}</strong></p>`;
+                            testimonialsSlider.appendChild(div);
+                        });
+                    } catch(e2) {
+                        testimonialsSlider.parentElement.style.display = 'none';
+                    }
+                }
             } else {
                 testimonialsSlider.parentElement.style.display = 'none';
             }
@@ -519,23 +562,47 @@
             const faqContainer = document.getElementById('faq-container');
             faqContainer.innerHTML = '';
             if (course.faqs) {
-                const faqList = course.faqs.split('|');
-                faqList.forEach(f => {
-                    const [question, answer] = f.split(':');
-                    const div = document.createElement('div');
-                    div.className = 'faq-item';
-                    div.innerHTML = `
-                        <div class="faq-question"><span>${question.trim()}</span><i class="fa fa-chevron-down"></i></div>
-                        <div class="faq-answer">${answer.trim()}</div>`;
-                    faqContainer.appendChild(div);
-                });
-                document.querySelectorAll('.faq-question').forEach(q => {
-                    q.addEventListener('click', () => {
-                        q.classList.toggle('active');
-                        const ans = q.nextElementSibling;
-                        ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
+                try {
+                    const faqs = JSON.parse(course.faqs);
+                    faqs.forEach(f => {
+                        const div = document.createElement('div');
+                        div.className = 'faq-item';
+                        div.innerHTML = `
+                            <div class="faq-question"><span>${f.question}</span><i class="fa fa-chevron-down"></i></div>
+                            <div class="faq-answer">${f.answer}</div>`;
+                        faqContainer.appendChild(div);
                     });
-                });
+                    document.querySelectorAll('.faq-question').forEach(q => {
+                        q.addEventListener('click', () => {
+                            q.classList.toggle('active');
+                            const ans = q.nextElementSibling;
+                            ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
+                        });
+                    });
+                } catch (e) {
+                    // Fallback to simple text if JSON parsing fails
+                    try {
+                        const faqList = course.faqs.split('|');
+                        faqList.forEach(f => {
+                            const [question, answer] = f.split(':');
+                            const div = document.createElement('div');
+                            div.className = 'faq-item';
+                            div.innerHTML = `
+                                <div class="faq-question"><span>${question.trim()}</span><i class="fa fa-chevron-down"></i></div>
+                                <div class="faq-answer">${answer.trim()}</div>`;
+                            faqContainer.appendChild(div);
+                        });
+                        document.querySelectorAll('.faq-question').forEach(q => {
+                            q.addEventListener('click', () => {
+                                q.classList.toggle('active');
+                                const ans = q.nextElementSibling;
+                                ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
+                            });
+                        });
+                    } catch(e2) {
+                        faqContainer.parentElement.style.display = 'none';
+                    }
+                }
             } else {
                 faqContainer.parentElement.style.display = 'none';
             }
@@ -543,11 +610,15 @@
             const achievementsList = document.getElementById('achievements-list');
             achievementsList.innerHTML = '';
             if (course.achievementsText) {
-                course.achievementsText.split('|').forEach(achText => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<i class="fa fa-star"></i> ${achText.trim()}`;
-                    achievementsList.appendChild(li);
-                });
+                try {
+                    course.achievementsText.split('|').forEach(achText => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<i class="fa fa-star"></i> ${achText.trim()}`;
+                        achievementsList.appendChild(li);
+                    });
+                } catch(e) {
+                    console.error('Error parsing achievements:', e);
+                }
             } else {
                 achievementsList.parentElement.style.display = 'none';
             }
