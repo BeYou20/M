@@ -178,56 +178,6 @@
   .certificate-section img { max-width: 100%; height: auto; border: 5px solid var(--primary-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform 0.3s; }
   .certificate-section img:hover { transform: scale(1.03); }
 
-  /* Registration Form */
-  #registrationForm {
-    background: #e0f7f2;
-    padding: 30px;
-    border-radius: 15px;
-    border: 2px solid var(--accent-color);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
-  }
-  #registrationForm h2 { margin-bottom: 20px; color: var(--primary-color); }
-  #registrationForm label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 700;
-    font-size: 14px;
-    color: #555;
-  }
-  #registrationForm input, #registrationForm select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    font-family: 'Tajawal', sans-serif;
-    transition: border-color 0.3s;
-  }
-  #registrationForm input:focus, #registrationForm select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-  }
-  #registrationForm button {
-    background: var(--primary-color);
-    color: #fff;
-    font-weight: 700;
-    font-size: 17px;
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    cursor:pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
-  }
-  #registrationForm button:hover {
-    background: #003366;
-    color: #fff;
-    transform: translateY(-2px);
-  }
-
   /* Sticky Buttons */
   .sticky-register-btn {
       position: fixed;
@@ -355,7 +305,7 @@
     <ul id="achievements-list" style="margin-top:20px; font-weight:bold; color:var(--primary-color); list-style:none; padding-right:0;"></ul>
   </div>
 
-  <div class="container" data-aos="fade-up" style="text-align: center; margin-top: 30px;">
+  <div class="container" id="register-now-section" data-aos="fade-up" style="text-align: center; margin-top: 30px;">
       <h2>💡 لتبدأ رحلة النجاح، انقر هنا للتسجيل!</h2>
       <p>انضم إلينا الآن وانطلق نحو تحقيق أهدافك.</p>
       <a href="#" id="register-link" class="btn btn-register" style="margin-top: 20px;">
@@ -387,7 +337,7 @@
   </div>
 </footer>
 
-<a href="#registrationForm" class="btn btn-register sticky-register-btn">سجل الآن</a>
+<a href="#register-now-section" class="btn btn-register sticky-register-btn">سجل الآن</a>
 <a href="https://whatsapp.com/channel/0029VaCRNug3bbV13vVHyR0Z" class="sticky-whatsapp-btn" target="_blank" aria-label="تواصل معنا عبر واتساب">
     <i class="fab fa-whatsapp"></i>
 </a>
@@ -420,7 +370,6 @@
                 document.getElementById('testimonials-slider').parentElement.style.display = 'none';
                 document.getElementById('faq-container').parentElement.style.display = 'none';
                 document.querySelector('.certificate-section').style.display = 'none';
-                document.getElementById('registrationForm').parentElement.style.display = 'none';
                 return;
             }
 
@@ -429,7 +378,6 @@
             document.getElementById('marquee-text').innerText = course.marqueeText || "";
             document.querySelector('.video-section iframe').src = course.videoUrl || "";
             document.getElementById('course-about').innerText = course.courseAbout || "";
-            document.getElementById('course-name-input').value = course.title || "";
 
             const objectivesList = document.getElementById('objectives-list');
             objectivesList.innerHTML = '';
@@ -597,7 +545,6 @@
                 achievementsList.parentElement.style.display = 'none';
             }
             
-            // الكود الجديد الذي يضيف اسم الدورة إلى رابط التسجيل
             const registerLink = document.getElementById('register-link');
             if (registerLink && course.title) {
                 const encodedCourseTitle = encodeURIComponent(course.title);
@@ -617,11 +564,10 @@
             document.getElementById('testimonials-slider').parentElement.style.display = 'none';
             document.getElementById('faq-container').parentElement.style.display = 'none';
             document.querySelector('.certificate-section').style.display = 'none';
-            document.getElementById('registrationForm').parentElement.style.display = 'none';
         }
     }
     loadCourseData();
 </script>
-
 </body>
 </html>
+ 
