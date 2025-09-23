@@ -342,6 +342,7 @@
     <i class="fab fa-whatsapp"></i>
 </a>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="sliderfr.js"></script>
 
 <script>
     AOS.init();
@@ -558,6 +559,10 @@
                 const encodedCourseTitle = encodeURIComponent(course.title);
                 registerLink.href = `form.html?course=${encodedCourseTitle}`;
             }
+            
+            // ✅ السطر الذي يحل المشكلة:
+            // استدعاء دالة تشغيل السلايدر بعد اكتمال تحميل البيانات
+            window.startSliders();
 
         } catch (err) {
             console.error('Error fetching course data:', err);
@@ -576,10 +581,9 @@
             document.querySelector('.certificate-section').style.display = 'none';
         }
     }
-    loadCourseData();
-</script>
 
-<script src="sliderfr.js"></script>
+    document.addEventListener('DOMContentLoaded', loadCourseData);
+</script>
 
 </body>
 </html>
