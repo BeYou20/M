@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج التسجيل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="countries.js"></script>
+    <style>
+        :root {
+            --primary-color: #011f4b;
+            --secondary-color: #fec107;
+            --accent-color: #5ad5b0;
+            --text-color: #212529;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            direction: rtl;
+            text-align: right;
+            padding: 20px;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #e0f7f2, #ffffff);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .form-header h2 {
+            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .form-header h2 .sparkle {
+            animation: sparkle 1s infinite alternate;
+            display: inline-block;
+        }
+
+        @keyframes sparkle {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .form-header p {
+            color: #555;
+            font-size: 16px;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background-color: #ccc;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input,
+        .input-with-icon select {
+            width: 100%;
+            padding: 12px 15px;
+            padding-left: 45px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+        }
+
+        .input-with-icon input:focus, .input-with-icon select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(1, 31, 75, 0.15);
+        }
+        
+        .input-with-icon .floating-label {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            font-weight: 700;
+            color: #888;
+            font-size: 15px;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-with-icon input:focus + .floating-label,
+        .input-with-icon input:not(:placeholder-shown) + .floating-label,
+        .input-with-icon select:focus + .floating-label,
+        .input-with-icon select:not([value=""]) + .floating-label {
+            top: -10px;
+            right: 0;
+            font-size: 12px;
+            color: var(--primary-color);
+            background: linear-gradient(135deg, #e0f7f2, #ffffff);
+            padding: 0 5px;
+        }
+
+        .input-with-icon .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            pointer-events: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .input-with-icon input:focus, .input-with-icon select:focus {
+            padding-left: 45px;
+        }
+
+        .input-with-icon .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-with-icon input.is-invalid, .input-with-icon select.is-invalid {
+            border-color: #dc3545;
+            animation: shake 0.5s;
+        }
+        
+        button {
+            background: linear-gradient(45deg, var(--secondary-color), #ff9800);
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s, background-color 0.3s, opacity 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        button .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        button.loading .loader { display: block; }
+        button.loading .btn-text { visibility: hidden; }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        #form-message {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        #form-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        #form-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2 id="form-main-title">انطلق نحو التميز <span class="sparkle">✨</span> وسجّل الآن</h2>
+        <p>املأ البيانات بدقة للانضمام إلى رحلتنا التعليمية.</p>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    
+    <form id="form" action="https://script.google.com/macros/s/AKfycbyp5BCm_hojFc2o515r5q-ermSjC68sKaxAbzN2qyGFMuCLWF8ywlYIcX8JdQ7OP3p-WQ/exec" method="post">
+        <div class="input-group">
+            <div class="input-with-icon">
+                <input type="text" name="name" id="name" placeholder=" " required autofocus autocapitalize="words">
+                <label class="floating-label" for="name">الاسم الثلاثي الكامل</label>
+                <i class="icon fas fa-user"></i>
+            </div>
+            <div class="error-message" id="name-error">الرجاء إدخال الاسم الثلاثي الكامل.</div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-with-icon">
+                <select name="gender" id="gender" required>
+                    <option value="" disabled selected>الجنس</option>
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                </select>
+                <label class="floating-label" for="gender">الجنس</label>
+                <i class="icon fas fa-venus-mars"></i>
+            </div>
+            <div class="error-message" id="gender-error">الرجاء اختيار الجنس.</div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-with-icon">
+                <input type="number" name="age" id="age" placeholder=" " inputmode="numeric" required min="1" max="99">
+                <label class="floating-label" for="age">العمر</label>
+                <i class="icon fas fa-birthday-cake"></i>
+            </div>
+            <div class="error-message" id="age-error"></div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-with-icon">
+                <select name="country" id="country" required>
+                    <option value="" disabled selected>اختر البلد</option>
+                </select>
+                <label class="floating-label" for="country">البلد</label>
+                <i class="icon fas fa-globe"></i>
+            </div>
+            <div class="error-message" id="country-error">الرجاء اختيار اسم البلد.</div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-with-icon">
+                <input type="tel" name="phone" id="phone" placeholder=" " pattern="^\+\d{8,15}$" inputmode="tel" required>
+                <label class="floating-label" for="phone">رقم الواتساب</label>
+                <i class="icon fab fa-whatsapp"></i>
+            </div>
+            <div class="error-message" id="phone-error">الرجاء إدخال رقم هاتف صحيح (مثال: +966...).</div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-with-icon">
+                <input type="email" name="email" id="email" placeholder=" " required autocapitalize="none">
+                <label class="floating-label" for="email">البريد الإلكتروني</label>
+                <i class="icon fas fa-envelope"></i>
+            </div>
+            <div class="error-message" id="email-error">الرجاء إدخال بريد إلكتروني صحيح.</div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-with-icon">
+                <input type="text" name="telegram" id="telegram" placeholder=" " autocapitalize="none">
+                <label class="floating-label" for="telegram">معرّف حساب تيليجرام (اختياري)</label>
+                <i class="icon fab fa-telegram-plane"></i>
+            </div>
+        </div>
+
+        <input type="hidden" name="CourseName" id="course-name-input">
+        <input type="hidden" name="registrationDate" id="registration-date-input">
+
+        <button type="submit" id="submit-btn">
+            <span class="btn-text">أرسل بياناتك وسجل الآن</span>
+            <div class="loader"></div>
+        </button>
+    </form>
+    
+    <div id="form-message" style="display:none;"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('form');
+        const submitBtn = document.getElementById('submit-btn');
+        const formMessage = document.getElementById('form-message');
+        const inputs = document.querySelectorAll("#form input:not([type='hidden']), #form select");
+        const progressBar = document.getElementById('progress-bar');
+        const formMainTitle = document.getElementById('form-main-title');
+        const totalInputs = inputs.length;
+        
+        // مصفوفة تحتوي على رسائل خطأ فكاهية لحقل العمر
+        const ageErrorMessages = [
+            "عفوًا 😅 واضح إنك حضرت افتتاح أول مدرسة بالعالم! النظام ما يتحمل فوق 99 سنة... لو أكبر، لازم تدخل مع فريق الديناصورات في المتحف 🤭.",
+            "عفوًا 😅 شكلك الوحيد اللي كان مع نوح في السفينة 🛶! النموذج ما يقبل فوق 99... إذا أكبر من كذا، متحف التاريخ الطبيعي فاتح لك ذراعيه 🤭.",
+            "عفوًا 😅 إذا عمرك فوق 99، فهذا يعني إنك لعبت مع آدم في الحديقة 😂! النظام يتوقف هنا، والباقي يكمّلوه في المتحف 🤭.",
+            "عفوًا 😅 واضح إنك كنت حاضر لحظة اختراع العجلة الأولى 🚲! عندنا حد أقصى 99 سنة، بعدها يتم تحويلك تلقائيًا إلى قسم الآثار 🤭.",
+            "عفوًا 😅 يبدو أنك من جيل الأجداد الأوائل ! المؤسسة عندها سقف 99 سنة بس... يعني لو عمرك أكثر، لازم تسجل في متحف التاريخ الطبيعي بدل من هنا 🤭."
+        ];
+
+        // تأكد من إخفاء جميع رسائل الخطأ عند تحميل الصفحة
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+        // ملء حقل اسم الدورة من عنوان URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseName = urlParams.get("course");
+        if (courseName) {
+            const decodedCourseName = decodeURIComponent(courseName);
+            document.getElementById("course-name-input").value = decodedCourseName;
+            formMainTitle.innerHTML = `📘 أنت تسجل الآن في: <span style="color:var(--accent-color);">${decodedCourseName}</span>`;
+        }
+
+        // ملء قائمة الدول المنسدلة
+        const countrySelect = document.getElementById('country');
+        arabCountries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countrySelect.appendChild(option);
+        });
+
+        // تحديث شريط التقدم
+        const updateProgress = () => {
+            let filledInputs = 0;
+            inputs.forEach(input => {
+                // التحقق من أن القيمة ليست فارغة
+                if (input.value && input.checkValidity() && input.value !== "") {
+                    filledInputs++;
+                }
+            });
+            const progress = (filledInputs / totalInputs) * 100;
+            progressBar.style.width = `${progress}%`;
+        };
+        
+        // التحقق من صحة المدخلات وتحديث الواجهة
+        inputs.forEach(input => {
+            const icon = input.closest('.input-with-icon').querySelector('.icon');
+            const errorMessage = input.closest('.input-group').querySelector('.error-message');
+
+            input.addEventListener("input", () => {
+                // تحقق خاص من صحة حقل العمر
+                if (input.id === 'age') {
+                    const ageValue = parseInt(input.value, 10);
+                    if (ageValue > 99 || input.value.length > 2) {
+                        input.classList.add('is-invalid');
+                        // اختيار رسالة عشوائية من المصفوفة
+                        const randomIndex = Math.floor(Math.random() * ageErrorMessages.length);
+                        errorMessage.textContent = ageErrorMessages[randomIndex];
+                        if (errorMessage) errorMessage.style.display = 'block';
+                    } else {
+                        input.classList.remove('is-invalid');
+                        if (errorMessage) errorMessage.style.display = 'none';
+                    }
+                }
+                
+                // التحقق العام من صحة جميع المدخلات
+                if (input.checkValidity() && input.value !== "") {
+                    icon.style.color = "#28a745";
+                } else {
+                    icon.style.color = "var(--primary-color)";
+                }
+                updateProgress();
+            });
+
+            input.addEventListener("blur", () => {
+                // التعامل مع التحقق من صحة الحقول عند فقدان التركيز
+                if (input.id === 'age') {
+                    const ageValue = parseInt(input.value, 10);
+                    if (!input.checkValidity() && input.value && (ageValue > 99)) {
+                        input.classList.add('is-invalid');
+                        const randomIndex = Math.floor(Math.random() * ageErrorMessages.length);
+                        errorMessage.textContent = ageErrorMessages[randomIndex];
+                        if (errorMessage) errorMessage.style.display = 'block';
+                    } else {
+                        input.classList.remove('is-invalid');
+                        if (errorMessage) errorMessage.style.display = 'none';
+                    }
+                } else {
+                    if (!input.checkValidity() && input.value !== "") {
+                        input.classList.add('is-invalid');
+                        if (errorMessage) errorMessage.style.display = 'block';
+                    }
+                }
+            });
+        });
+
+        // منطق إرسال النموذج
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            let isFormValid = form.checkValidity();
+            const ageInput = document.getElementById('age');
+            if (parseInt(ageInput.value, 10) > 99) {
+                isFormValid = false;
+            }
+
+            if (!isFormValid) {
+                inputs.forEach(input => {
+                    const errorMessage = input.closest('.input-group').querySelector('.error-message');
+                    if (!input.checkValidity() || (input.id === 'age' && parseInt(input.value, 10) > 99)) {
+                        input.classList.add('is-invalid');
+                        if (input.id === 'age') {
+                            const randomIndex = Math.floor(Math.random() * ageErrorMessages.length);
+                            errorMessage.textContent = ageErrorMessages[randomIndex];
+                        }
+                        if (errorMessage) errorMessage.style.display = 'block';
+                    } else {
+                        input.classList.remove('is-invalid');
+                        if (errorMessage) errorMessage.style.display = 'none';
+                    }
+                });
+                return;
+            }
+
+            // هنا يتم إضافة التاريخ والوقت قبل الإرسال
+            document.getElementById('registration-date-input').value = new Date().toLocaleString('ar-AE', { timeZone: 'Asia/Dubai' });
+
+            const isConfirmed = confirm('هل أنت متأكد من صحة البيانات المدخلة؟');
+            if (!isConfirmed) return;
+            
+            submitBtn.disabled = true;
+            submitBtn.classList.add('loading');
+            formMessage.style.display = 'none';
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                formMessage.style.display = 'block';
+                formMessage.className = 'success';
+                formMessage.textContent = '✅ تم إرسال بياناتك بنجاح! سيتم التواصل معك قريبًا.';
+                form.reset();
+                updateProgress();
+                inputs.forEach(input => {
+                    input.classList.remove('is-invalid');
+                    const icon = input.closest('.input-with-icon').querySelector('.icon');
+                    if(icon) icon.style.color = "var(--primary-color)";
+                });
+
+            } catch (error) {
+                formMessage.style.display = 'block';
+                formMessage.className = 'error';
+                formMessage.textContent = '❌ حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

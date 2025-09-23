@@ -355,40 +355,14 @@
     <ul id="achievements-list" style="margin-top:20px; font-weight:bold; color:var(--primary-color); list-style:none; padding-right:0;"></ul>
   </div>
 
-  <section>
-    <div id="registrationForm" data-aos="fade-up">
-          <h2>💡 لتبدأ رحلة النجاح سجل الآن </h2>
-      <form id="form" onsubmit="submitForm(event)">
-        <label for="name">الاسم الثلاثي</label>
-        <input type="text" name="name" id="name" placeholder="الاسم الثلاثي" required>
-
-        <label for="gender">الجنس</label>
-        <select name="gender" id="gender" required>
-          <option value="" disabled selected>الجنس</option>
-          <option value="ذكر">ذكر</option>
-        <option value="أنثى">أنثى</option>
-        </select>
-
-        <label for="age">العمر</label>
-        <input type="number" name="age" id="age" placeholder="العمر" required>
-
-        <label for="country">البلد</label>
-        <input type="text" name="country" id="country" placeholder="البلد" required>
-
-        <label for="phone">رقم الهاتف</label>
-        <input type="tel" name="phone" id="phone" placeholder="رقم الهاتف" required>
-
-        <label for="email">البريد الإلكتروني</label>
-        <input type="email" name="email" id="email" placeholder="البريد الإلكتروني" required>
-
-        <label for="telegram">رابط حسابك تيلجرام</label>
-        <input type="url" name="Telegram" id="telegram" placeholder="رابط حسابك تيلجرام" required>
-        
-        <input type="hidden" name="CourseName" id="course-name-input">
-        <button type="submit">إرسال البيانات</button>
-      </form>
-    </div>
-  </section>
+  <div class="container" data-aos="fade-up" style="text-align: center; margin-top: 30px;">
+      <h2>💡 لتبدأ رحلة النجاح، انقر هنا للتسجيل!</h2>
+      <p>انضم إلينا الآن وانطلق نحو تحقيق أهدافك.</p>
+      <a href="#" id="register-link" class="btn btn-register" style="margin-top: 20px;">
+          اضغط هنا للتسجيل
+      </a>
+  </div>
+  
 </div>
 
 <footer>
@@ -622,6 +596,14 @@
             } else {
                 achievementsList.parentElement.style.display = 'none';
             }
+            
+            // الكود الجديد الذي يضيف اسم الدورة إلى رابط التسجيل
+            const registerLink = document.getElementById('register-link');
+            if (registerLink && course.title) {
+                const encodedCourseTitle = encodeURIComponent(course.title);
+                registerLink.href = `form.html?course=${encodedCourseTitle}`;
+            }
+
         } catch (err) {
             console.error('Error fetching course data:', err);
             document.getElementById('hero-title').innerText = "⚠️ حدث خطأ أثناء تحميل البيانات";
@@ -639,27 +621,6 @@
         }
     }
     loadCourseData();
-
-    async function submitForm(event) {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-            const res = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const result = await res.json();
-            alert(result.status || 'تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً.');
-            form.reset();
-        } catch (err) {
-            console.error(err);
-            alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
-        }
-    }
 </script>
 
 </body>
