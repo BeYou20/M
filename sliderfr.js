@@ -67,8 +67,9 @@ function initializeSlider(containerId, slideClassName, dotClassName) {
     startAutoSlide();
 }
 
-// تشغيل وظيفة السلايدر لكل من سلايدر المدربين وسلايدر آراء المتدربين
-document.addEventListener('DOMContentLoaded', () => {
+// دالة عامة لتشغيل جميع السلايدرات
+// تم تغييرها لتكون دالة منفصلة يتم استدعاؤها من index.html
+window.startSliders = function() {
     initializeSlider('instructors-slider', 'instructor-slide', 'dot');
     initializeSlider('testimonials-slider', 'testimonial-slide', 'dot');
-});
+};
