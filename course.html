@@ -378,6 +378,7 @@
             document.getElementById('marquee-text').innerText = course.marqueeText || "";
             document.querySelector('.video-section iframe').src = course.videoUrl || "";
             document.getElementById('course-about').innerText = course.courseAbout || "";
+            document.getElementById('course-name-input').value = course.title || "";
 
             const objectivesList = document.getElementById('objectives-list');
             objectivesList.innerHTML = '';
@@ -412,36 +413,44 @@
             }
 
             const instructorsSlider = document.getElementById('instructors-slider');
+            const instructorDots = instructorsSlider.querySelector('.instructor-dots');
             instructorsSlider.innerHTML = '';
             if (course.instructors) {
                 try {
                     const instructors = JSON.parse(course.instructors);
                     instructors.forEach((inst, i) => {
-                        const div = document.createElement('div');
-                        div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
-                        div.innerHTML = `
+                        const slide = document.createElement('div');
+                        slide.className = 'instructor-slide';
+                        slide.innerHTML = `
                             <div class="instructor-card">
                                 <img src="${inst.photo}" alt="${inst.name}">
                                 <h4>${inst.name}</h4>
                                 <p>${inst.role}</p>
                             </div>`;
-                        instructorsSlider.appendChild(div);
+                        instructorsSlider.appendChild(slide);
+                        const dot = document.createElement('span');
+                        dot.className = 'dot';
+                        dot.dataset.slideIndex = i;
+                        instructorDots.appendChild(dot);
                     });
                 } catch (e) {
-                    // Fallback to simple text if JSON parsing fails
                     try {
                         const instructorNames = course.instructors.split('|');
                         instructorNames.forEach((inst, i) => {
                             const [name, role] = inst.split(' - ');
-                            const div = document.createElement('div');
-                            div.className = 'instructor-slide' + (i === 0 ? ' active' : '');
-                            div.innerHTML = `
+                            const slide = document.createElement('div');
+                            slide.className = 'instructor-slide';
+                            slide.innerHTML = `
                                 <div class="instructor-card">
                                     <img src="https://via.placeholder.com/150" alt="${name}">
                                     <h4>${name}</h4>
                                     <p>${role}</p>
                                 </div>`;
-                            instructorsSlider.appendChild(div);
+                            instructorsSlider.appendChild(slide);
+                            const dot = document.createElement('span');
+                            dot.className = 'dot';
+                            dot.dataset.slideIndex = i;
+                            instructorDots.appendChild(dot);
                         });
                     } catch(e2) {
                         instructorsSlider.parentElement.style.display = 'none';
@@ -450,28 +459,37 @@
             } else {
                 instructorsSlider.parentElement.style.display = 'none';
             }
-
+            instructorsSlider.appendChild(instructorDots);
+            
             const testimonialsSlider = document.getElementById('testimonials-slider');
+            const testimonialDots = testimonialsSlider.querySelector('.testimonial-dots');
             testimonialsSlider.innerHTML = '';
             if (course.testimonials) {
                 try {
                     const testimonials = JSON.parse(course.testimonials);
                     testimonials.forEach((t, i) => {
-                        const div = document.createElement('div');
-                        div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
-                        div.innerHTML = `<p class="testimonial-text">"${t.text}"</p><p><strong>${t.name}</strong></p>`;
-                        testimonialsSlider.appendChild(div);
+                        const slide = document.createElement('div');
+                        slide.className = 'testimonial-slide';
+                        slide.innerHTML = `<p class="testimonial-text">"${t.text}"</p><p><strong>${t.name}</strong></p>`;
+                        testimonialsSlider.appendChild(slide);
+                        const dot = document.createElement('span');
+                        dot.className = 'dot';
+                        dot.dataset.slideIndex = i;
+                        testimonialDots.appendChild(dot);
                     });
                 } catch (e) {
-                    // Fallback to simple text if JSON parsing fails
                     try {
                         const testimonialList = course.testimonials.split('|');
                         testimonialList.forEach((t, i) => {
                             const [text, name] = t.split(' - ');
-                            const div = document.createElement('div');
-                            div.className = 'testimonial-slide' + (i === 0 ? ' active' : '');
-                            div.innerHTML = `<p class="testimonial-text">"${text}"</p><p><strong>${name}</strong></p>`;
-                            testimonialsSlider.appendChild(div);
+                            const slide = document.createElement('div');
+                            slide.className = 'testimonial-slide';
+                            slide.innerHTML = `<p class="testimonial-text">"${text}"</p><p><strong>${name}</strong></p>`;
+                            testimonialsSlider.appendChild(slide);
+                            const dot = document.createElement('span');
+                            dot.className = 'dot';
+                            dot.dataset.slideIndex = i;
+                            testimonialDots.appendChild(dot);
                         });
                     } catch(e2) {
                         testimonialsSlider.parentElement.style.display = 'none';
@@ -480,6 +498,7 @@
             } else {
                 testimonialsSlider.parentElement.style.display = 'none';
             }
+            testimonialsSlider.appendChild(testimonialDots);
 
             const faqContainer = document.getElementById('faq-container');
             faqContainer.innerHTML = '';
@@ -502,7 +521,6 @@
                         });
                     });
                 } catch (e) {
-                    // Fallback to simple text if JSON parsing fails
                     try {
                         const faqList = course.faqs.split('|');
                         faqList.forEach(f => {
@@ -568,6 +586,7 @@
     }
     loadCourseData();
 </script>
+<script src="sliderfr.js"></script>
+
 </body>
 </html>
- 
